@@ -24,6 +24,10 @@ export default function ContainerSceneModule() {
 
   // --- KONFIGURASI YARD ---
   const CONFIG = {
+    FLOOR: {
+      position: { x: 0, y: 0, z: 0 },
+      rotation: { x: 0, y: 0, z: 0 },
+    },
     GRID: {
       rows: 20,
       cols: 15,
@@ -44,26 +48,70 @@ export default function ContainerSceneModule() {
   // Global grid tracker
   let gridMatrix = [];
 
+  // helpers: accept degrees or radians like TruckScene
+  function _maybeRad(v) {
+    if (v === undefined || v === null) return 0;
+    if (Math.abs(v) > 2 * Math.PI) return (v * Math.PI) / 180;
+    return v;
+  }
+
+  function _applyRotationFromConfig(obj, rot) {
+    if (!obj || !rot) return;
+    const rx = _maybeRad(rot.x || 0);
+    const ry = _maybeRad(rot.y || 0);
+    const rz = _maybeRad(rot.z || 0);
+    if (rx) obj.rotateX(rx);
+    if (ry) obj.rotateY(ry);
+    if (rz) obj.rotateZ(rz);
+  }
+
   async function init(context = {}) {
     scene = context.scene;
     scene.add(group);
 
     if (typeof setupLighting === "function") setupLighting(scene);
 
-    // 1. Setup Floor
+    // 1. Setup Floor - use same loading logic as TruckScene: try GLTF then fallback
+    let floorInstance = null;
     try {
-      const { Mesh, PlaneGeometry, MeshStandardMaterial } = await import(
-        "three"
-      );
-      const floor = new Mesh(
-        new PlaneGeometry(300, 300),
-        new MeshStandardMaterial({ color: 0x333333, roughness: 0.8 })
-      );
-      floor.rotation.x = -Math.PI / 2;
-      floor.receiveShadow = true;
-      group.add(floor);
+      const floorGltf = await new Promise((resolve, reject) => {
+        const l = new GLTFLoader();
+        l.load("/3d-model/concrete_floor.glb", resolve, undefined, reject);
+      });
+      if (floorGltf && floorGltf.scene) {
+        floorInstance = floorGltf.scene.clone(true);
+        floorInstance.traverse((n) => {
+          if (n.isMesh) n.receiveShadow = true;
+        });
+        floorInstance.position.set(
+          CONFIG.FLOOR.position.x,
+          CONFIG.FLOOR.position.y,
+          CONFIG.FLOOR.position.z
+        );
+        _applyRotationFromConfig(floorInstance, CONFIG.FLOOR.rotation);
+        group.add(floorInstance);
+      }
     } catch (e) {
-      // ignore
+      // fallback: simple plane
+      try {
+        const { Mesh, PlaneGeometry, MeshStandardMaterial } = await import(
+          "three"
+        );
+        const mat = new MeshStandardMaterial({ color: 0x888888 });
+        const plane = new Mesh(new PlaneGeometry(200, 200), mat);
+        plane.rotateX(-Math.PI / 2);
+        plane.receiveShadow = true;
+        plane.position.set(
+          CONFIG.FLOOR.position.x,
+          CONFIG.FLOOR.position.y,
+          CONFIG.FLOOR.position.z
+        );
+        _applyRotationFromConfig(plane, CONFIG.FLOOR.rotation);
+        floorInstance = plane;
+        group.add(plane);
+      } catch (err) {
+        // ignore
+      }
     }
 
     // 2. Load Model
