@@ -1,0 +1,655 @@
+{
+  "machines": [
+    {
+      "id": "arrow",
+      "previewImage": "/3d-model/textures/arrow-preview.jpg",
+      "title": "Arrow Indicator",
+      "machineId": "IND-000-AR",
+      "PLC": "-",
+      "nodeRed": "-",
+      "dateAdded": "2025-01-10",
+      "location": "Floor 0 - Conveyor",
+      "indicators": {
+        "airTemperature": "51.3 Celsius",
+        "billetTemperature": "-",
+        "numberOfBillet": "-"
+      },
+      "alarms": {
+        "active": 0,
+        "total": 0,
+        "list": []
+      },
+      "healthScore": 98,
+      "predictiveMaintenance": [],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Arrow indicator remained operational with no mechanical feedback required this shift.",
+        "why": "Component serves purely as a visual aid and does not experience thermal or mechanical loading.",
+        "recommendedAction": "Verify LED visibility during daily walks and clean the lens if dust accumulation is observed."
+      }
+    },
+    {
+      "id": "casting-machine",
+      "previewImage": "/3d-model/textures/casting-preview.jpg",
+      "title": "Casting Machine",
+      "machineId": "MCH-101-CM",
+      "PLC": "4",
+      "nodeRed": "1882",
+      "dateAdded": "February 2023",
+      "location": "Plant A - Bay 3",
+      "indicators": {
+        "airTemperature": "48.7 Celsius",
+        "billetTemperature": "820 Celsius",
+        "numberOfBillet": "12"
+      },
+      "alarms": {
+        "active": 2,
+        "total": 10,
+        "list": ["LSYS_Alarm_003", "CCS_Alarm_013"]
+      },
+      "healthScore": 56,
+      "predictiveMaintenance": [
+        {
+          "part": "Gear",
+          "predictive": "June 2024",
+          "last": "January 2024",
+          "health": 20,
+          "thumbnail": "/3d-model/motor.jpeg"
+        },
+        {
+          "part": "Pulley",
+          "predictive": "March 2024",
+          "last": "December 2023",
+          "health": 65,
+          "thumbnail": "/3d-model/bearing.jpg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Primary drive gear exhibited high vibration and surface scoring during the last production cycle.",
+        "why": "High torque casting runs combined with reduced lubrication flow accelerated gear tooth fatigue and wear.",
+        "recommendedAction": "Shut down during the next planned window, replace the damaged gear set, purge the lubrication line, and recalibrate torque limits."
+      }
+    },
+    {
+      "id": "furnace",
+      "previewImage": "/3d-model/textures/furnace-preview.jpg",
+      "title": "Furnace",
+      "machineId": "MCH-102-FN",
+      "PLC": "2",
+      "nodeRed": "1890",
+      "dateAdded": "2024-06-15",
+      "location": "Furnace Hall",
+      "indicators": {
+        "airTemperature": "120.0 Celsius",
+        "billetTemperature": "1200 Celsius",
+        "numberOfBillet": "6"
+      },
+      "alarms": { "active": 1, "total": 4, "list": ["CM_Alarm_052"] },
+      "healthScore": 76,
+      "predictiveMaintenance": [
+        {
+          "part": "Platen",
+          "predictive": "March 2024",
+          "last": "December 2023",
+          "health": 80,
+          "thumbnail": "/3d-model/motor.jpeg"
+        },
+        {
+          "part": "Combustion Fan",
+          "predictive": "April 2024",
+          "last": "October 2023",
+          "health": 62,
+          "thumbnail": "/3d-model/bearing.jpg"
+        },
+        {
+          "part": "Burner Nozzle",
+          "predictive": "May 2024",
+          "last": "November 2023",
+          "health": 54,
+          "thumbnail": "/3d-model/motor.jpeg"
+        },
+        {
+          "part": "Thermocouple Array",
+          "predictive": "June 2024",
+          "last": "January 2024",
+          "health": 71,
+          "thumbnail": "/3d-model/bearing.jpg"
+        },
+        {
+          "part": "Gas Valve Manifold",
+          "predictive": "July 2024",
+          "last": "February 2024",
+          "health": 65,
+          "thumbnail": "/3d-model/motor.jpeg"
+        },
+        {
+          "part": "Circulation Blower",
+          "predictive": "August 2024",
+          "last": "January 2024",
+          "health": 58,
+          "thumbnail": "/3d-model/bearing.jpg"
+        },
+        {
+          "part": "Ignition Transformer",
+          "predictive": "September 2024",
+          "last": "March 2024",
+          "health": 73,
+          "thumbnail": "/3d-model/motor.jpeg"
+        },
+        {
+          "part": "Exhaust Damper",
+          "predictive": "October 2024",
+          "last": "April 2024",
+          "health": 69,
+          "thumbnail": "/3d-model/bearing.jpg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Thermal scans identified early spalling on the north-side refractory panels and rising exhaust temperatures.",
+        "why": "Uneven burner mix and prolonged high-temperature holds created localized hot spots that exceeded refractory tolerance.",
+        "recommendedAction": "Cool the furnace for inspection, replace affected refractory tiles, balance burner flow, and validate exhaust damper profiles before restart."
+      }
+    },
+    {
+      "id": "furnace2",
+      "previewImage": "/3d-model/textures/furnace-preview.jpg",
+      "title": "Furnace (2)",
+      "machineId": "MCH-102-FN-2",
+      "PLC": "2",
+      "nodeRed": "1891",
+      "dateAdded": "2024-06-20",
+      "location": "Furnace Hall",
+      "indicators": {
+        "airTemperature": "115.2 Celsius",
+        "billetTemperature": "1180 Celsius",
+        "numberOfBillet": "5"
+      },
+      "alarms": { "active": 0, "total": 2, "list": [] },
+      "healthScore": 82,
+      "predictiveMaintenance": [
+        {
+          "part": "Exhaust Damper",
+          "predictive": "October 2024",
+          "last": "April 2024",
+          "health": 69,
+          "thumbnail": "/3d-model/motor.jpeg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Heat curve deviated by 12°C midway through the soak period.",
+        "why": "One burner manifold reported intermittent ignition due to fouled nozzles and weak airflow.",
+        "recommendedAction": "Clean the burner assembly, replace worn igniters, and run a post-service temperature uniformity survey."
+      }
+    },
+    {
+      "id": "homogenizing",
+      "previewImage": "/3d-model/textures/homogenizing-preview.jpg",
+      "title": "Homogenizing",
+      "machineId": "MCH-103-HG",
+      "PLC": "5",
+      "nodeRed": "1884",
+      "dateAdded": "2023-02-01",
+      "location": "Line B",
+      "indicators": {
+        "airTemperature": "51.3 Celsius",
+        "billetTemperature": "-",
+        "numberOfBillet": "-"
+      },
+      "alarms": {
+        "active": 3,
+        "total": 34,
+        "list": ["LSYS_Alarm_003", "CCS_Alarm_013", "CM_Alarm_052"]
+      },
+      "healthScore": 56,
+      "predictiveMaintenance": [
+        {
+          "part": "Valve",
+          "predictive": "March 2024",
+          "last": "December 2023",
+          "health": 43,
+          "thumbnail": "/3d-model/bearing.jpg"
+        },
+        {
+          "part": "Podpora",
+          "predictive": "June 2024",
+          "last": "January 2024",
+          "health": 68,
+          "thumbnail": "/3d-model/motor.jpeg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Gearbox telemetry flagged rising vibration and metal particles in the oil sample.",
+        "why": "Water ingress and degraded lubricant film reduced bearing protection, accelerating gear tooth wear.",
+        "recommendedAction": "Drain and flush the gearbox, replace seals, align the drive shafts, and install a moisture indicator on the breather."
+      }
+    },
+    {
+      "id": "launder",
+      "previewImage": "/3d-model/textures/launder-preview.jpg",
+      "title": "Launder",
+      "machineId": "MCH-104-LD",
+      "PLC": "3",
+      "nodeRed": "1886",
+      "dateAdded": "2023-05-12",
+      "location": "Line C",
+      "indicators": {
+        "airTemperature": "45.0 Celsius",
+        "billetTemperature": "-",
+        "numberOfBillet": "-"
+      },
+      "alarms": { "active": 0, "total": 5, "list": [] },
+      "healthScore": 88,
+      "predictiveMaintenance": [],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Launder maintained stable metal flow with no temperature drift detected.",
+        "why": "Channel surfaces remain clean and refractory coating is intact, sustaining laminar flow.",
+        "recommendedAction": "Continue weekly inspection, recoat surfaces during the next outage, and monitor thermal cameras for buildup."
+      }
+    },
+    {
+      "id": "rod-feeder",
+      "previewImage": "/3d-model/textures/rod-feeder-preview.jpg",
+      "title": "Rod Feeder",
+      "machineId": "MCH-105-RF",
+      "PLC": "6",
+      "nodeRed": "1892",
+      "dateAdded": "2024-03-10",
+      "location": "Feeder Bay",
+      "indicators": {
+        "airTemperature": "37.8 Celsius",
+        "billetTemperature": "-",
+        "numberOfBillet": "-"
+      },
+      "alarms": { "active": 1, "total": 3, "list": ["CM_Alarm_020"] },
+      "healthScore": 70,
+      "predictiveMaintenance": [
+        {
+          "part": "Feed Roller",
+          "predictive": "April 2024",
+          "last": "January 2024",
+          "health": 60,
+          "thumbnail": "/3d-model/bearing.jpg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Feed roller slip increased by 4% causing billet spacing inconsistency.",
+        "why": "Friction surface glazing and uneven actuator pressure reduced traction on incoming stock.",
+        "recommendedAction": "Resurface the roller, recalibrate actuator pressure, and validate encoder feedback alignment."
+      }
+    },
+    {
+      "id": "sir",
+      "previewImage": "/3d-model/textures/sir-preview.jpg",
+      "title": "SIR Machine",
+      "machineId": "MCH-106-SR",
+      "PLC": "7",
+      "nodeRed": "1900",
+      "dateAdded": "2024-07-01",
+      "location": "SIR Bay",
+      "indicators": {
+        "airTemperature": "40.2 Celsius",
+        "billetTemperature": "-",
+        "numberOfBillet": "-"
+      },
+      "alarms": { "active": 0, "total": 1, "list": [] },
+      "healthScore": 90,
+      "predictiveMaintenance": [],
+      "prescriptiveMaintenance": {
+        "whatHappened": "System check completed with no abnormal ultrasonic readings.",
+        "why": "Motion stages and probes remained within calibrated tolerances throughout the inspection run.",
+        "recommendedAction": "Maintain current monitoring cadence and archive baseline waveforms for trend comparison."
+      }
+    },
+    {
+      "id": "ut",
+      "previewImage": "/3d-model/textures/ut-preview.jpg",
+      "title": "UT Machine",
+      "machineId": "MCH-107-UT",
+      "PLC": "8",
+      "nodeRed": "1901",
+      "dateAdded": "2024-08-12",
+      "location": "Inspection Bay",
+      "indicators": {
+        "airTemperature": "39.0 Celsius",
+        "billetTemperature": "-",
+        "numberOfBillet": "-"
+      },
+      "alarms": { "active": 0, "total": 0, "list": [] },
+      "healthScore": 95,
+      "predictiveMaintenance": [],
+      "prescriptiveMaintenance": {
+        "whatHappened": "UT scanner executed daily routine with consistent signal-to-noise ratio.",
+        "why": "Probe coupling fluid and transducer alignment remained stable during the shift.",
+        "recommendedAction": "Refill coupling reservoir, wipe probes, and document performance in the inspection log."
+      }
+    },
+    {
+      "id": "ct-1",
+      "previewImage": "/3d-model/textures/ct-1-preview.jpg",
+      "title": "Cooling Table Segment 1",
+      "machineId": "MCH-108-CT1",
+      "PLC": "9",
+      "nodeRed": "1905",
+      "dateAdded": "2024-04-04",
+      "location": "Cooling Line - Section A",
+      "indicators": {
+        "airTemperature": "32.4 Celsius",
+        "billetTemperature": "410 Celsius",
+        "numberOfBillet": "3"
+      },
+      "alarms": {
+        "active": 1,
+        "total": 6,
+        "list": ["CT1_ALARM_001"]
+      },
+      "healthScore": 72,
+      "predictiveMaintenance": [
+        {
+          "part": "Transfer Roller",
+          "predictive": "May 2024",
+          "last": "November 2023",
+          "health": 55,
+          "thumbnail": "/3d-model/motor.jpeg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Transfer roller vibration rose above 6 mm/s RMS.",
+        "why": "Scale debris migrated into the bearing seats, increasing friction and creating hot spots.",
+        "recommendedAction": "Strip and clean bearing housings, pack with high-temp grease, and install debris guards on upstream rollers."
+      }
+    },
+    {
+      "id": "ct-2",
+      "previewImage": "/3d-model/textures/ct-2-preview.jpg",
+      "title": "Cooling Table Segment 2",
+      "machineId": "MCH-109-CT2",
+      "PLC": "10",
+      "nodeRed": "1906",
+      "dateAdded": "2024-04-04",
+      "location": "Cooling Line - Section B",
+      "indicators": {
+        "airTemperature": "31.1 Celsius",
+        "billetTemperature": "365 Celsius",
+        "numberOfBillet": "2"
+      },
+      "alarms": {
+        "active": 0,
+        "total": 4,
+        "list": []
+      },
+      "healthScore": 84,
+      "predictiveMaintenance": [
+        {
+          "part": "Hydraulic Cylinder",
+          "predictive": "August 2024",
+          "last": "February 2024",
+          "health": 78,
+          "thumbnail": "/3d-model/bearing.jpg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Cylinder retract time slowed by 1.4 seconds during repeated drops.",
+        "why": "Reservoir temperature climbed due to restricted cooler airflow and aging hydraulic fluid.",
+        "recommendedAction": "Clean condenser fins, replace hydraulic oil, and retune valve timing for steady response."
+      }
+    },
+    {
+      "id": "ct-3",
+      "previewImage": "/3d-model/textures/ct-3-preview.jpg",
+      "title": "Cooling Table Segment 3",
+      "machineId": "MCH-110-CT3",
+      "PLC": "11",
+      "nodeRed": "1907",
+      "dateAdded": "2024-04-04",
+      "location": "Cooling Line - Section C",
+      "indicators": {
+        "airTemperature": "30.2 Celsius",
+        "billetTemperature": "320 Celsius",
+        "numberOfBillet": "4"
+      },
+      "alarms": {
+        "active": 1,
+        "total": 5,
+        "list": ["CT3_ALARM_004"]
+      },
+      "healthScore": 68,
+      "predictiveMaintenance": [
+        {
+          "part": "Cross Conveyor",
+          "predictive": "July 2024",
+          "last": "December 2023",
+          "health": 48,
+          "thumbnail": "/3d-model/motor.jpeg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Overnight monitoring recorded a 15% torque spike on the cross conveyor motor.",
+        "why": "Chain alignment drifted after a jam event, causing uneven load distribution across the bed.",
+        "recommendedAction": "Realign the chain, replace worn guides, and run a no-load burn-in to confirm torque normalization."
+      }
+    },
+    {
+      "id": "ct-4",
+      "previewImage": "/3d-model/textures/ct-4-preview.jpg",
+      "title": "Cooling Table Segment 4",
+      "machineId": "MCH-111-CT4",
+      "PLC": "12",
+      "nodeRed": "1908",
+      "dateAdded": "2024-04-04",
+      "location": "Cooling Line - Section D",
+      "indicators": {
+        "airTemperature": "29.8 Celsius",
+        "billetTemperature": "295 Celsius",
+        "numberOfBillet": "1"
+      },
+      "alarms": {
+        "active": 0,
+        "total": 3,
+        "list": []
+      },
+      "healthScore": 88,
+      "predictiveMaintenance": [
+        {
+          "part": "Exit Roller",
+          "predictive": "September 2024",
+          "last": "January 2024",
+          "health": 82,
+          "thumbnail": "/3d-model/bearing.jpg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Exit roller assembly operated smoothly with nominal torque loading.",
+        "why": "Lubrication schedule and alignment checks remain effective in preventing drag buildup.",
+        "recommendedAction": "Keep the monthly lubrication cadence and log alignment readings after each production batch."
+      }
+    },
+    {
+      "id": "charging-machine",
+      "previewImage": "/3d-model/textures/charging-preview.jpg",
+      "title": "Charging Machine",
+      "machineId": "MCH-112-CH",
+      "PLC": "3",
+      "nodeRed": "1910",
+      "dateAdded": "2023-11-18",
+      "location": "Charging Bay",
+      "indicators": {
+        "airTemperature": "42.0 Celsius",
+        "billetTemperature": "-",
+        "numberOfBillet": "15"
+      },
+      "alarms": {
+        "active": 2,
+        "total": 12,
+        "list": ["CHG_ALARM_002", "CHG_ALARM_006"]
+      },
+      "healthScore": 64,
+      "predictiveMaintenance": [
+        {
+          "part": "Lift Chain",
+          "predictive": "June 2024",
+          "last": "December 2023",
+          "health": 52,
+          "thumbnail": "/3d-model/motor.jpeg"
+        },
+        {
+          "part": "Hydraulic Pump",
+          "predictive": "August 2024",
+          "last": "February 2024",
+          "health": 71,
+          "thumbnail": "/3d-model/bearing.jpg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Lift mechanism reported 3% elongation and audible chatter under load.",
+        "why": "Consecutive heavy charge cycles without rest periods overheated the chain and fatigued the links.",
+        "recommendedAction": "Replace the chain assembly, adjust load scheduling to include cooldown intervals, and confirm the relief valve setpoint."
+      }
+    },
+    {
+      "id": "swarf",
+      "previewImage": "/3d-model/textures/swarf-preview.jpg",
+      "title": "Swarf Collection",
+      "machineId": "MCH-113-SW",
+      "PLC": "-",
+      "nodeRed": "1915",
+      "dateAdded": "2024-01-05",
+      "location": "Recycle Area",
+      "indicators": {
+        "airTemperature": "34.6 Celsius",
+        "billetTemperature": "-",
+        "numberOfBillet": "-"
+      },
+      "alarms": {
+        "active": 0,
+        "total": 2,
+        "list": []
+      },
+      "healthScore": 92,
+      "predictiveMaintenance": [
+        {
+          "part": "Auger Drive",
+          "predictive": "October 2024",
+          "last": "January 2024",
+          "health": 86,
+          "thumbnail": "/3d-model/motor.jpeg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Swarf auger operated within torque limits but metal fines accumulated near the discharge chute.",
+        "why": "Intermittent cleaning schedule allowed compacted chips to bridge, increasing localized load.",
+        "recommendedAction": "Vacuum out the chute, inspect auger flighting for wear, and switch to a three-times-per-week cleaning cadence."
+      }
+    },
+    {
+      "id": "sawing",
+      "previewImage": "/3d-model/textures/sawing-preview.jpg",
+      "title": "Sawing Station",
+      "machineId": "MCH-114-SW",
+      "PLC": "13",
+      "nodeRed": "1920",
+      "dateAdded": "2023-09-22",
+      "location": "Saw Line",
+      "indicators": {
+        "airTemperature": "36.5 Celsius",
+        "billetTemperature": "-",
+        "numberOfBillet": "9"
+      },
+      "alarms": {
+        "active": 1,
+        "total": 8,
+        "list": ["SAW_ALARM_007"]
+      },
+      "healthScore": 61,
+      "predictiveMaintenance": [
+        {
+          "part": "Saw Blade",
+          "predictive": "May 2024",
+          "last": "January 2024",
+          "health": 47,
+          "thumbnail": "/3d-model/bearing.jpg"
+        },
+        {
+          "part": "Coolant Pump",
+          "predictive": "July 2024",
+          "last": "November 2023",
+          "health": 69,
+          "thumbnail": "/3d-model/motor.jpeg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Blade monitoring showed rapid tooth dulling and increased kerf temperature.",
+        "why": "Aggressive feed rates with reduced coolant delivery overheated the cutting edge.",
+        "recommendedAction": "Replace the blade, flush and refill the coolant system, and recalibrate automatic feed parameters."
+      }
+    },
+    {
+      "id": "weightning",
+      "previewImage": "/3d-model/textures/weightning-preview.jpg",
+      "title": "Weighting Station",
+      "machineId": "MCH-115-WT",
+      "PLC": "14",
+      "nodeRed": "1925",
+      "dateAdded": "2023-03-18",
+      "location": "Quality Lab",
+      "indicators": {
+        "airTemperature": "25.0 Celsius",
+        "billetTemperature": "-",
+        "numberOfBillet": "-"
+      },
+      "alarms": {
+        "active": 0,
+        "total": 3,
+        "list": []
+      },
+      "healthScore": 89,
+      "predictiveMaintenance": [
+        {
+          "part": "Load Cell",
+          "predictive": "December 2024",
+          "last": "June 2023",
+          "health": 74,
+          "thumbnail": "/3d-model/bearing.jpg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Weight readings drifted by +/-0.4 kg during batch sampling.",
+        "why": "Thermal creep in the load cell and loose isolation mounts introduced measurement error.",
+        "recommendedAction": "Recalibrate the scale, tighten mounts, and install a temperature compensation routine within PLC logic."
+      }
+    },
+    {
+      "id": "storage",
+      "previewImage": "/3d-model/textures/storage-preview.jpg",
+      "title": "Storage Rack",
+      "machineId": "MCH-116-ST",
+      "PLC": "-",
+      "nodeRed": "1930",
+      "dateAdded": "2022-12-11",
+      "location": "Warehouse",
+      "indicators": {
+        "airTemperature": "28.3 Celsius",
+        "billetTemperature": "-",
+        "numberOfBillet": "24"
+      },
+      "alarms": {
+        "active": 0,
+        "total": 1,
+        "list": []
+      },
+      "healthScore": 94,
+      "predictiveMaintenance": [
+        {
+          "part": "Rack Inspection",
+          "predictive": "January 2025",
+          "last": "January 2024",
+          "health": 88,
+          "thumbnail": "/3d-model/motor.jpeg"
+        }
+      ],
+      "prescriptiveMaintenance": {
+        "whatHappened": "Rack inspection noted minor fastener relaxation on the east bay sections.",
+        "why": "Thermal expansion and forklift impacts gradually reduced clamp torque across the frame.",
+        "recommendedAction": "Retorque all fasteners, add protective bumpers, and schedule ultrasonic checks on load-bearing welds each quarter."
+      }
+    }
+  ]
+}

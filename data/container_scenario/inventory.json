@@ -1,0 +1,6 @@
+{
+  "containers": [
+    { "id": "C1", "col": 0, "row": 0, "height": 2 },
+    { "id": "C2", "col": 1, "row": 0, "height": 1 }
+  ]
+}

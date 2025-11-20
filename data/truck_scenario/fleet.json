@@ -1,0 +1,6 @@
+{
+  "fleet": [
+    { "id": "truck-1", "length": 3, "color": "#ff6f00" },
+    { "id": "truck-2", "length": 3, "color": "#ff6f00" }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "containers": [
+    {
+      "id": "C1",
+      "grid": { "row": 0, "col": 0, "stack": 1 },
+      "color": "#FF0000"
+    },
+    {
+      "id": "C2",
+      "grid": { "row": 0, "col": 1, "stack": 2 },
+      "color": "#00FF00"
+    }
+  ]
+}
