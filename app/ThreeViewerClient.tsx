@@ -9,6 +9,7 @@ export default function ThreeViewerClient() {
   const ref = useRef<HTMLDivElement | null>(null);
   const managerRef = useRef<any | null>(null);
   const [active, setActive] = useState<"truck" | "container">("truck");
+  const [recVisible, setRecVisible] = useState<boolean>(false);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -75,6 +76,32 @@ export default function ThreeViewerClient() {
         >
           Container Scene
         </button>
+        {active === "container" && (
+          <button
+            onClick={() => {
+              if (!managerRef.current || !managerRef.current.currentScenario)
+                return;
+              try {
+                const res =
+                  managerRef.current.currentScenario.toggleRecommendations?.();
+                // toggleRecommendations may return boolean sync or undefined; handle both
+                if (typeof res === "boolean") setRecVisible(res);
+                else setRecVisible((v) => !v);
+              } catch (e) {
+                console.error(e);
+              }
+            }}
+            style={{
+              padding: "6px 12px",
+              background: recVisible ? "#0a84ff" : "#eee",
+              color: recVisible ? "#fff" : "#000",
+              border: "none",
+              borderRadius: 6,
+            }}
+          >
+            {recVisible ? "Hide Recommendations" : "Show Recommendations"}
+          </button>
+        )}
       </div>
       <div ref={ref} style={{ width: "100%", height: "520px" }} />
     </div>

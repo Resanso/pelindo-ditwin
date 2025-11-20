@@ -13,6 +13,8 @@ export default function TruckSceneModule() {
   let curve = null;
   let truckGltf = null;
   let truckInstance = null;
+  let containerGltf = null;
+  let containerInstances = [];
   let trucks = []; // multiple truck instances for bottleneck scenario
   let t = 0; // normalized progress [0,1]
   let speed = 0.02; // speed factor (t per second)
@@ -31,6 +33,8 @@ export default function TruckSceneModule() {
 
   // Truck scale: change this to scale the truck model uniformly
   const TRUCK_SCALE = 1.5; // 1.0 = original size, 0.5 = half, 2.0 = double
+  // Container model scale
+  const CONTAINER_SCALE = 1.0;
 
   // Configurable transforms: change these consts to adjust positions/rotations
   const CONFIG = {
@@ -393,6 +397,49 @@ export default function TruckSceneModule() {
 
     // optionally adjust camera or other UI elements here
 
+    // --- Load lot-container model (optional) ---
+    try {
+      const containerLoader = new GLTFLoader();
+      const cGltf = await new Promise((resolve, reject) => {
+        containerLoader.load(
+          "/3d-model/lot-container.glb",
+          resolve,
+          undefined,
+          (err) => {
+            containerLoader.load(
+              "/models/lot-container.glb",
+              resolve,
+              undefined,
+              reject
+            );
+          }
+        );
+      });
+      containerGltf = cGltf;
+      if (containerGltf && containerGltf.scene) {
+        const cInst = containerGltf.scene.clone(true);
+        cInst.traverse((n) => {
+          if (n.isMesh) {
+            n.castShadow = true;
+            n.receiveShadow = true;
+          }
+        });
+        // apply default container scale and place near the road/queue
+        try {
+          cInst.scale.set(CONTAINER_SCALE, CONTAINER_SCALE, CONTAINER_SCALE);
+        } catch (err) {}
+        // position: place slightly to the side of the truck lane
+        const px = (CONFIG.TRUCK.queuePoint || 110) + 10;
+        const py = CONFIG.FLOOR.position.y || 0;
+        const pz = (CONFIG.TRUCK.zPos || CONFIG.TRUCK.positionOffset.z) - 30;
+        cInst.position.set(px, py, pz);
+        group.add(cInst);
+        containerInstances.push(cInst);
+      }
+    } catch (err) {
+      // ignore if missing; container is optional
+    }
+
     // --- Global restart state ---
     let isScenarioFinished = false;
     let finishTimer = 0;
@@ -565,6 +612,16 @@ export default function TruckSceneModule() {
         }
       }
     }
+    // remove any container instances we added
+    if (containerInstances && containerInstances.length) {
+      for (const ci of containerInstances) {
+        try {
+          if (ci.parent) ci.parent.remove(ci);
+        } catch (e) {}
+      }
+    }
+    containerInstances = [];
+    containerGltf = null;
     truckGltf = null;
     truckInstance = null;
     trucks = [];

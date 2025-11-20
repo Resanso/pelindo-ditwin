@@ -1,194 +1,299 @@
-import { Group, Vector3 } from "three";
+import {
+  Group,
+  Object3D,
+  Color,
+  InstancedMesh,
+  BoxGeometry,
+  MeshStandardMaterial,
+  MeshBasicMaterial,
+  DynamicDrawUsage,
+} from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import setupLighting from "../components/Lighting"; // per requirement
+import setupLighting from "../components/Lighting";
 
 export default function ContainerSceneModule() {
   let scene = null;
-  let camera = null;
-  let renderer = null;
+  let group = new Group();
 
-  const group = new Group(); // holds all containers for easy cleanup
-  let containerGltf = null;
+  // Main container mesh (Real)
+  let instancedMesh = null;
 
-  // parameters / constants
-  const SLOT_W = 2.5; // width per column
-  const SLOT_L = 6.0; // length per row
-  const STACK_H = 2.5; // height per stack unit
+  // Recommendation ghost mesh (transparent)
+  let ghostInstancedMesh = null;
+  let isRecVisible = false;
+
+  // --- KONFIGURASI YARD ---
+  const CONFIG = {
+    GRID: {
+      rows: 20,
+      cols: 15,
+      maxStack: 5,
+      gapX: 5,
+      gapY: 0.8,
+      gapZ: 4.0,
+    },
+    DIMENSIONS: {
+      width: 2.5,
+      height: 2.6,
+      length: 6.1,
+    },
+    SCALE: 0.05,
+    COLORS: ["#D32F2F", "#1976D2", "#388E3C", "#FBC02D", "#5D4037", "#455A64"],
+  };
+
+  // Global grid tracker
+  let gridMatrix = [];
 
   async function init(context = {}) {
     scene = context.scene;
-    camera = context.camera;
-    renderer = context.renderer;
-
     scene.add(group);
 
     if (typeof setupLighting === "function") setupLighting(scene);
 
-    // load floor model (concrete floor) from public 3d-model
-    let floorInstance = null;
+    // 1. Setup Floor
     try {
-      const floorGltf = await new Promise((resolve, reject) => {
-        const l = new GLTFLoader();
-        l.load("/3d-model/concrete_floor.glb", resolve, undefined, reject);
-      });
-      if (floorGltf && floorGltf.scene) {
-        floorInstance = floorGltf.scene.clone(true);
-        floorInstance.traverse((n) => {
-          if (n.isMesh) n.receiveShadow = true;
-        });
-        floorInstance.position.set(0, 0, 0);
-        group.add(floorInstance);
-      }
+      const { Mesh, PlaneGeometry, MeshStandardMaterial } = await import(
+        "three"
+      );
+      const floor = new Mesh(
+        new PlaneGeometry(300, 300),
+        new MeshStandardMaterial({ color: 0x333333, roughness: 0.8 })
+      );
+      floor.rotation.x = -Math.PI / 2;
+      floor.receiveShadow = true;
+      group.add(floor);
     } catch (e) {
-      // fallback: plane
-      try {
-        const { Mesh, PlaneGeometry, MeshStandardMaterial } = await import(
-          "three"
-        );
-        const mat = new MeshStandardMaterial({ color: 0x888888 });
-        const plane = new Mesh(new PlaneGeometry(200, 200), mat);
-        plane.rotateX(-Math.PI / 2);
-        plane.receiveShadow = true;
-        plane.position.set(0, 0, 0);
-        floorInstance = plane;
-        group.add(plane);
-      } catch (err) {}
+      // ignore
     }
 
-    // load inventory.json
-    let inventory = [];
-    try {
-      const res = await fetch("/data/container_scenario/inventory.json");
-      const json = await res.json();
-      if (json && Array.isArray(json.containers)) {
-        inventory = json.containers;
-      }
-    } catch (e) {
-      // fallback sample
-      inventory = [
-        { id: "C1", grid: { row: 0, col: 0, stack: 1 }, color: "#FF0000" },
-        { id: "C2", grid: { row: 0, col: 1, stack: 2 }, color: "#00FF00" },
-      ];
-    }
-
-    // load container model
+    // 2. Load Model
     const loader = new GLTFLoader();
+    let geometry = null;
+    let material = null;
+
     try {
-      containerGltf = await new Promise((resolve, reject) => {
-        // try public 3d-model path first
-        loader.load("/3d-model/container.glb", resolve, undefined, (err) => {
-          loader.load("/models/container.glb", resolve, undefined, reject);
-        });
+      let gltf = null;
+      try {
+        gltf = await loader.loadAsync("/3d-model/container.glb");
+      } catch (err) {
+        gltf = await loader.loadAsync("/models/container.glb");
+      }
+      gltf.scene.traverse((child) => {
+        if (child.isMesh) {
+          geometry = child.geometry;
+          material = child.material;
+          if (material && material.map) material.map.encoding = 3001;
+        }
       });
     } catch (e) {
-      containerGltf = null;
+      console.warn("Fallback to BoxGeometry");
+      geometry = new BoxGeometry(
+        CONFIG.DIMENSIONS.width,
+        CONFIG.DIMENSIONS.height,
+        CONFIG.DIMENSIONS.length
+      );
+      material = new MeshStandardMaterial({ color: 0xffffff });
     }
 
-    // instantiate each inventory item
-    for (const item of inventory) {
-      const row = (item.grid && item.grid.row) || 0;
-      const col = (item.grid && item.grid.col) || 0;
-      const stack = (item.grid && item.grid.stack) || 1;
-      const color = item.color || null;
+    // 3. Generate Data & Grid Matrix
+    const instanceData = [];
+    const rows = CONFIG.GRID.rows;
+    const cols = CONFIG.GRID.cols;
 
-      // compute world position for base of the stack
-      const baseX = col * SLOT_W;
-      const baseZ = row * SLOT_L;
+    // Reset matrix
+    gridMatrix = Array(rows)
+      .fill(0)
+      .map(() => Array(cols).fill(0));
 
-      // for each stacked height, create an instance and position with y offset
-      for (let s = 0; s < stack; s++) {
-        const y = s * STACK_H + STACK_H / 2; // center of container
-        let instance = null;
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        // Random existing containers
+        if (Math.random() > 0.2) {
+          const stackHeight =
+            Math.floor(Math.random() * CONFIG.GRID.maxStack) + 1;
+          gridMatrix[r][c] = stackHeight;
 
-        if (containerGltf && containerGltf.scene) {
-          instance = containerGltf.scene.clone(true);
-          // attempt to set color if provided and mesh materials are color-able
-          if (color) {
-            instance.traverse((n) => {
-              if (n.isMesh && n.material) {
-                // clone material to avoid mutating shared material
-                try {
-                  if (Array.isArray(n.material)) {
-                    n.material = n.material.map((m) => {
-                      const clone = m.clone();
-                      if (clone.color) clone.color.set(color);
-                      return clone;
-                    });
-                  } else {
-                    const clone = n.material.clone();
-                    if (clone.color) clone.color.set(color);
-                    n.material = clone;
-                  }
-                } catch (e) {
-                  // if color can't be applied, ignore
-                }
-              }
+          for (let s = 0; s < stackHeight; s++) {
+            instanceData.push({
+              row: r,
+              col: c,
+              stack: s,
+              color:
+                CONFIG.COLORS[Math.floor(Math.random() * CONFIG.COLORS.length)],
             });
           }
         } else {
-          // fallback: simple box if model missing
-          const { Mesh, BoxGeometry, MeshStandardMaterial } = await import(
-            "three"
-          );
-          const mat = new MeshStandardMaterial({ color: color || 0x1565c0 });
-          instance = new Mesh(new BoxGeometry(2.4, 2.4, 5.8), mat);
-        }
-
-        instance.position.set(baseX, y, baseZ);
-        instance.userData = {
-          id: item.id,
-          col,
-          row,
-          stackIndex: s,
-        };
-        group.add(instance);
-      }
-    }
-  }
-
-  function update(/* delta */) {
-    // no animation by default; if desired add subtle bob or hover
-  }
-
-  async function cleanup() {
-    if (group && scene) {
-      scene.remove(group);
-    }
-
-    // traverse and dispose geometries & materials we created or cloned
-    group.traverse((obj) => {
-      if (obj.isMesh) {
-        if (obj.geometry) {
-          try {
-            obj.geometry.dispose();
-          } catch (e) {}
-        }
-        if (obj.material) {
-          if (Array.isArray(obj.material)) {
-            obj.material.forEach((m) => {
-              try {
-                if (m.map) m.map.dispose();
-                m.dispose();
-              } catch (e) {}
-            });
-          } else {
-            try {
-              if (obj.material.map) obj.material.map.dispose();
-              obj.material.dispose();
-            } catch (e) {}
-          }
+          gridMatrix[r][c] = 0;
         }
       }
+    }
+
+    // 4. Create Real Containers (InstancedMesh)
+    if (instanceData.length > 0) {
+      instancedMesh = new InstancedMesh(
+        geometry,
+        material,
+        instanceData.length
+      );
+      instancedMesh.castShadow = true;
+      instancedMesh.receiveShadow = true;
+      instancedMesh.instanceMatrix.setUsage(DynamicDrawUsage);
+
+      const dummy = new Object3D();
+      const colorHelper = new Color();
+
+      instanceData.forEach((data, i) => {
+        const { x, y, z } = calculatePosition(data.row, data.col, data.stack);
+
+        dummy.position.set(x, y, z);
+        dummy.rotation.set(0, 0, 0);
+        dummy.scale.set(CONFIG.SCALE, CONFIG.SCALE, CONFIG.SCALE);
+        dummy.updateMatrix();
+
+        instancedMesh.setMatrixAt(i, dummy.matrix);
+        colorHelper.set(data.color);
+        if (instancedMesh.setColorAt) instancedMesh.setColorAt(i, colorHelper);
+      });
+
+      instancedMesh.instanceMatrix.needsUpdate = true;
+      if (instancedMesh.instanceColor)
+        instancedMesh.instanceColor.needsUpdate = true;
+      group.add(instancedMesh);
+    }
+
+    // 5. Generate All Recommendations (Ghost Mesh)
+    generateAllRecommendations(geometry);
+  }
+
+  // --- Helper Position ---
+  function calculatePosition(row, col, stackIndex) {
+    const totalWidth =
+      CONFIG.GRID.cols * (CONFIG.DIMENSIONS.width + CONFIG.GRID.gapX);
+    const totalDepth =
+      CONFIG.GRID.rows * (CONFIG.DIMENSIONS.length + CONFIG.GRID.gapZ);
+
+    const x =
+      col * (CONFIG.DIMENSIONS.width + CONFIG.GRID.gapX) - totalWidth / 2;
+    const z =
+      row * (CONFIG.DIMENSIONS.length + CONFIG.GRID.gapZ) - totalDepth / 2;
+    const gapY = CONFIG.GRID.gapY || 0;
+    const y =
+      stackIndex * (CONFIG.DIMENSIONS.height + gapY) +
+      CONFIG.DIMENSIONS.height / 2;
+
+    return { x, y, z };
+  }
+
+  // --- LOGIC: Generate ALL Valid Spots ---
+  function generateAllRecommendations(geometry) {
+    const validSpots = [];
+
+    for (let r = 0; r < CONFIG.GRID.rows; r++) {
+      for (let c = 0; c < CONFIG.GRID.cols; c++) {
+        const currentH = gridMatrix[r][c];
+
+        if (currentH < CONFIG.GRID.maxStack) {
+          validSpots.push({ row: r, col: c, stack: currentH });
+        }
+      }
+    }
+
+    if (validSpots.length === 0) return;
+
+    // Setup Material Ghost (translucent neon green)
+    const ghostMaterial = new MeshBasicMaterial({
+      color: 0x00ff00,
+      transparent: true,
+      opacity: 0.3,
+      wireframe: true,
+      depthWrite: false,
     });
 
-    while (group.children.length) group.remove(group.children[0]);
+    ghostInstancedMesh = new InstancedMesh(
+      geometry,
+      ghostMaterial,
+      validSpots.length
+    );
+    ghostInstancedMesh.instanceMatrix.setUsage(DynamicDrawUsage);
 
-    containerGltf = null;
+    const dummy = new Object3D();
+
+    validSpots.forEach((spot, i) => {
+      const { x, y, z } = calculatePosition(spot.row, spot.col, spot.stack);
+
+      dummy.position.set(x, y, z);
+      dummy.rotation.set(0, 0, 0);
+      dummy.scale.set(CONFIG.SCALE, CONFIG.SCALE, CONFIG.SCALE);
+      dummy.updateMatrix();
+
+      ghostInstancedMesh.setMatrixAt(i, dummy.matrix);
+    });
+
+    ghostInstancedMesh.instanceMatrix.needsUpdate = true;
+
+    ghostInstancedMesh.visible = false;
+    group.add(ghostInstancedMesh);
   }
 
-  return {
-    init,
-    update,
-    cleanup,
-  };
+  // --- API: Toggle Visibility ---
+  function toggleRecommendations(forceState) {
+    if (ghostInstancedMesh) {
+      isRecVisible =
+        typeof forceState === "boolean" ? forceState : !isRecVisible;
+      ghostInstancedMesh.visible = isRecVisible;
+      console.log("Recommendation Visibility:", isRecVisible);
+    }
+    return isRecVisible;
+  }
+
+  // --- Animation Loop ---
+  function update(delta) {
+    if (ghostInstancedMesh && ghostInstancedMesh.visible) {
+      const time = Date.now() * 0.003;
+      ghostInstancedMesh.material.opacity = 0.25 + Math.sin(time) * 0.15;
+    }
+  }
+
+  function cleanup() {
+    if (group && scene) scene.remove(group);
+
+    // Dispose Real Containers
+    if (instancedMesh) {
+      try {
+        if (instancedMesh.geometry && instancedMesh.geometry.dispose)
+          instancedMesh.geometry.dispose();
+      } catch (e) {}
+      try {
+        if (Array.isArray(instancedMesh.material)) {
+          instancedMesh.material.forEach((m) => m.dispose && m.dispose());
+        } else if (instancedMesh.material && instancedMesh.material.dispose) {
+          instancedMesh.material.dispose();
+        }
+      } catch (e) {}
+      try {
+        instancedMesh.dispose();
+      } catch (e) {}
+      instancedMesh = null;
+    }
+
+    // Dispose Ghost Containers
+    if (ghostInstancedMesh) {
+      try {
+        if (ghostInstancedMesh.geometry && ghostInstancedMesh.geometry.dispose)
+          ghostInstancedMesh.geometry.dispose();
+      } catch (e) {}
+      try {
+        if (ghostInstancedMesh.material && ghostInstancedMesh.material.dispose)
+          ghostInstancedMesh.material.dispose();
+      } catch (e) {}
+      try {
+        ghostInstancedMesh.dispose();
+      } catch (e) {}
+      ghostInstancedMesh = null;
+    }
+
+    while (group.children.length) group.remove(group.children[0]);
+  }
+
+  return { init, update, cleanup, toggleRecommendations };
 }
